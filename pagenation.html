@@ -1,29 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pagenation</title>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
-        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <title>Blog Pagination</title>
+    <style>
+        /* Add some basic CSS for styling */
+        .blog-card {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 10px;
+            width: 45%;
+            display: inline-block;
+        }
 
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
 
+        .pagination a {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 2px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            background-color: white; /* Default background color */
+            color: #333; /* Default text color */
+        }
+
+        .pagination a.active {
+            background-color: blue; /* Active background color */
+            color: white; /* Active text color */
+        }
+
+        .pagination a.disabled {
+            pointer-events: none;
+            color: #aaa;
+            background-color: #f1f1f1;
+        }
+    </style>
 </head>
 
 <body>
-
     <div id="blogContainer">
-
-    </div>
-    <div class="pagination">
-
+        <!-- Blog cards will be added here -->
     </div>
 
+    <div class="pagination" id="pagination">
+        <!-- "Previous" and "Next" buttons, and page number links will be added here -->
+    </div>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script>
         // Array of blogs
-        const blogs = [{
+      // Array of blogs
+      const blogs = [{
             "      title": "Truly Incredible India",
             "author": "Joe Vian",
             "image": "india",
@@ -88,6 +119,72 @@
 
         ]
 
+
+        // Number of blogs per page
+        const blogsPerPage = 2;
+
+        // Initialize the current page
+        let currentPage = 1;
+
+        // Function to display blogs and generate pagination controls
+        function displayBlogsAndPagination() {
+            const blogContainer = $('#blogContainer');
+            blogContainer.empty(); // Clear the container
+
+            // Calculate the start and end index for the current page
+            const startIndex = (currentPage - 1) * blogsPerPage;
+            const endIndex = startIndex + blogsPerPage;
+
+            // Loop through blogs for the current page
+            for (let i = startIndex; i < endIndex && i < blogs.length; i++) {
+                const blog = blogs[i];
+                const blogCard = $('<div class="blog-card"></div>');
+                blogCard.html(`
+                    <h2>${blog.title}</h2>
+                    <p>Author: ${blog.author}</p>
+                    <img src="${blog.image}.jpg" alt="${blog.title}">
+                    ${blog.bodytext}
+                `);
+                blogContainer.append(blogCard);
+            }
+
+            const pagination = $('#pagination');
+            pagination.empty(); // Clear the pagination controls
+
+            // Calculate the total number of pages
+            const totalPages = Math.ceil(blogs.length / blogsPerPage);
+
+            // Create "Previous" button
+            if (currentPage > 1) {
+                pagination.append($('<a href="#" class="prev">Previous</a>').click(() => {
+                    currentPage--;
+                    displayBlogsAndPagination();
+                }));
+            }
+
+            // Create page number links
+            for (let i = 1; i <= totalPages; i++) {
+                const pageLink = $(`<a href="#" data-page="${i}">${i}</a>`).click(function () {
+                    currentPage = parseInt($(this).data('page'));
+                    displayBlogsAndPagination();
+                });
+                if (i === currentPage) {
+                    pageLink.addClass('active');
+                }
+                pagination.append(pageLink);
+            }
+
+            // Create "Next" button
+            if (currentPage < totalPages) {
+                pagination.append($('<a href="#" class="next">Next</a>').click(() => {
+                    currentPage++;
+                    displayBlogsAndPagination();
+                }));
+            }
+        }
+
+        // Initial display and pagination generation
+        displayBlogsAndPagination();
     </script>
 </body>
 
